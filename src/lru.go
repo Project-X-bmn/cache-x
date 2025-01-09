@@ -53,11 +53,13 @@ func (lru *Cache) Put(key_name string, value interface{}) bool {
 	return true
 }
 
-func (lru *Cache) Delete(key string) {
+func (lru *Cache) Delete(key string) bool {
 	if elem, found := lru.items[key]; found {
 		delete(lru.items, key)
 		lru.list.Remove(elem)
+		return true
 	}
+	return false
 }
 
 func (lru *Cache) Size() int {
