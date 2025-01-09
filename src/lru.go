@@ -24,43 +24,44 @@ func NewLRUCache(capacity int) *Cache {
 	}
 }
 
-func (c *Cache) Get(key string) (interface{}, bool) {
-	if elem, found := c.items[key]; found {
-		c.list.MoveToFront(elem)
+func (lru *Cache) Get(key string) (interface{}, bool) {
+	if elem, found := lru.items[key]; found {
+		lru.list.MoveToFront(elem)
 		return elem.Value.(*Entry).value, true
 	}
 	return nil, false
 }
 
-func (c *Cache) Put(key string, value interface{}) {
-	if elem, found := c.items[key]; found {
+func (lru *Cache) Put(key_name string, value interface{}) bool {
+	if elem, exist := lru.items[key_name]; exist {
 		elem.Value.(*Entry).value = value
-		c.list.MoveToFront(elem)
-		return
+		lru.list.MoveToFront(elem)
+		return true
 	}
 
-	if c.list.Len() >= c.capacity {
-		last := c.list.Back()
+	if lru.list.Len() >= lru.capacity {
+		last := lru.list.Back()
 		if last != nil {
-			delete(c.items, last.Value.(*Entry).key)
-			c.list.Remove(last)
+			delete(lru.items, last.Value.(*Entry).key)
+			lru.list.Remove(last)
 		}
 	}
 
-	entry := &Entry{key: key, value: value}
-	elem := c.list.PushFront(entry)
-	c.items[key] = elem
+	entry := &Entry{key: key_name, value: value}
+	elem := lru.list.PushFront(entry)
+	lru.items[key_name] = elem
+	return true
 }
 
-func (c *Cache) Delete(key string) {
-	if elem, found := c.items[key]; found {
-		delete(c.items, key)
-		c.list.Remove(elem)
+func (lru *Cache) Delete(key string) {
+	if elem, found := lru.items[key]; found {
+		delete(lru.items, key)
+		lru.list.Remove(elem)
 	}
 }
 
-func (c *Cache) Size() int {
-	return c.list.Len()
+func (lru *Cache) Size() int {
+	return lru.list.Len()
 }
 
 func main() {
