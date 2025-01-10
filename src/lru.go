@@ -11,7 +11,7 @@ type Cache struct {
 	list     *list.List
 }
 
-type Entry struct {
+type Node struct {
 	key   string
 	value interface{}
 }
@@ -24,39 +24,39 @@ func NewLRUCache(capacity int) *Cache {
 	}
 }
 
-func (lru *Cache) Get(key string) interface{} {
-	if elem, found := lru.items[key]; found {
-		lru.list.MoveToFront(elem)
-		return elem.Value.(*Entry).value
+func (lru *Cache) Get(keyName string) interface{} {
+	if item, found := lru.items[keyName]; found {
+		lru.list.MoveToFront(item)
+		return item.Value.(*Node).value
 	}
 	return nil
 }
 
-func (lru *Cache) Put(key_name string, value interface{}) bool {
-	if elem, exist := lru.items[key_name]; exist {
-		elem.Value.(*Entry).value = value
-		lru.list.MoveToFront(elem)
+func (lru *Cache) Put(keyName string, value interface{}) bool {
+	if item, exist := lru.items[keyName]; exist {
+		item.Value.(*Node).value = value
+		lru.list.MoveToFront(item)
 		return true
 	}
 
 	if lru.list.Len() >= lru.capacity {
 		last := lru.list.Back()
 		if last != nil {
-			delete(lru.items, last.Value.(*Entry).key)
+			delete(lru.items, last.Value.(*Node).key)
 			lru.list.Remove(last)
 		}
 	}
 
-	entry := &Entry{key: key_name, value: value}
+	entry := &Node{key: keyName, value: value}
 	elem := lru.list.PushFront(entry)
-	lru.items[key_name] = elem
+	lru.items[keyName] = elem
 	return true
 }
 
-func (lru *Cache) Delete(key string) bool {
-	if elem, found := lru.items[key]; found {
-		delete(lru.items, key)
-		lru.list.Remove(elem)
+func (lru *Cache) Delete(keyName string) bool {
+	if item, found := lru.items[keyName]; found {
+		delete(lru.items, keyName)
+		lru.list.Remove(item)
 		return true
 	}
 	return false
