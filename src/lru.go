@@ -1,4 +1,4 @@
-package src
+package main
 
 import (
 	"container/list"
@@ -24,12 +24,12 @@ func NewLRUCache(capacity int) *Cache {
 	}
 }
 
-func (lru *Cache) Get(key string) (interface{}, bool) {
+func (lru *Cache) Get(key string) interface{} {
 	if elem, found := lru.items[key]; found {
 		lru.list.MoveToFront(elem)
-		return elem.Value.(*Entry).value, true
+		return elem.Value.(*Entry).value
 	}
-	return nil, false
+	return nil
 }
 
 func (lru *Cache) Put(key_name string, value interface{}) bool {
@@ -76,8 +76,8 @@ func main() {
 	fmt.Println(cache.Get("a")) // Output: 1, true
 	cache.Put("d", 4)           // "b" will be evicted
 
-	_, found := cache.Get("b")
-	fmt.Println(found) // Output: false
+	value := cache.Get("b")
+	fmt.Println(value) // Output: false
 
 	cache.Put("e", 5)           // "c" will be evicted
 	fmt.Println(cache.Get("c")) // Output: <nil>, false
