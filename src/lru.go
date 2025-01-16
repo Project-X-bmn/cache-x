@@ -6,68 +6,69 @@ import (
 )
 
 type Cache struct {
-	capacity int
-	items    map[string]*list.Element
-	list     *list.List
+	capacity         int
+	items            map[string]*list.Element // consists of key_name : node [node in d-l-l]
+	doublyLinkedList *list.List
 }
 
 type Node struct {
 	key   string
-	value interface{}
+	value interface{} // using interface as our value could be anything.
 }
 
-func NewLRUCache(capacity int) *Cache {
+func LRUCache(capacity int) *Cache {
 	return &Cache{
-		capacity: capacity,
-		items:    make(map[string]*list.Element),
-		list:     list.New(),
+		capacity:         capacity,
+		items:            make(map[string]*list.Element),
+		doublyLinkedList: list.New(),
 	}
 }
 
-func (lru *Cache) Get(keyName string) interface{} {
-	if item, found := lru.items[keyName]; found {
-		lru.list.MoveToFront(item)
-		return item.Value.(*Node).value
+func (cache *Cache) Get(keyName string) interface{} {
+
+	if node, found := cache.items[keyName]; found {
+		cache.doublyLinkedList.MoveToFront(node)
+		return node.Value.(*Node).value
 	}
 	return nil
 }
 
-func (lru *Cache) Put(keyName string, value interface{}) bool {
-	if item, exist := lru.items[keyName]; exist {
-		item.Value.(*Node).value = value
-		lru.list.MoveToFront(item)
+func (cache *Cache) Put(keyName string, value interface{}) bool {
+	if node, exist := cache.items[keyName]; exist {
+		node.Value.(*Node).value = value
+		cache.doublyLinkedList.MoveToFront(node)
 		return true
 	}
 
-	if lru.list.Len() >= lru.capacity {
-		last := lru.list.Back()
+	if cache.doublyLinkedList.Len() >= cache.capacity {
+		last := cache.doublyLinkedList.Back()
 		if last != nil {
-			delete(lru.items, last.Value.(*Node).key)
-			lru.list.Remove(last)
+			delete(cache.items, last.Value.(*Node).key)
+			cache.doublyLinkedList.Remove(last)
 		}
 	}
 
 	entry := &Node{key: keyName, value: value}
-	elem := lru.list.PushFront(entry)
-	lru.items[keyName] = elem
+	elem := cache.doublyLinkedList.PushFront(entry)
+	cache.items[keyName] = elem
 	return true
 }
 
-func (lru *Cache) Delete(keyName string) bool {
-	if item, found := lru.items[keyName]; found {
-		delete(lru.items, keyName)
-		lru.list.Remove(item)
+func (cache *Cache) Delete(keyName string) bool {
+	if node, found := cache.items[keyName]; found {
+		delete(cache.items, keyName)
+		cache.doublyLinkedList.Remove(node)
 		return true
 	}
 	return false
 }
 
-func (lru *Cache) Size() int {
-	return lru.list.Len()
+func (cache *Cache) Size() int {
+	return cache.doublyLinkedList.Len()
 }
 
 func main() {
-	cache := NewLRUCache(3)
+	cache := LRUCache(3)
 
 	cache.Put("a", 1)
 	cache.Put("b", 2)
