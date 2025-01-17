@@ -6,7 +6,7 @@ import (
 )
 
 type Cache struct {
-	capacity         int
+	bucketSize         int
 	items            map[string]*list.Element // consists of key_name : node [node in d-l-l]
 	doublyLinkedList *list.List
 }
@@ -18,7 +18,7 @@ type Node struct {
 
 func LRUCache(capacity int) *Cache {
 	return &Cache{
-		capacity:         capacity,
+		bucketSize:       capacity,
 		items:            make(map[string]*list.Element),
 		doublyLinkedList: list.New(),
 	}
@@ -40,6 +40,7 @@ func (cache *Cache) Put(keyName string, value interface{}) bool {
 		return true
 	}
 
+<<<<<<< HEAD
 	if cache.doublyLinkedList.Len() >= cache.capacity {
 		last := cache.doublyLinkedList.Back()
 		if last != nil {
@@ -47,13 +48,29 @@ func (cache *Cache) Put(keyName string, value interface{}) bool {
 				return true
 			}
 			return false
+=======
+	if cache.doublyLinkedList.Len() >= cache.bucketSize {
+		if status := cache.Invalidate(); status {
+			return true
+>>>>>>> dev_nikhil_inmemory_cache_base_files
 		}
+		return false
+
 	}
 
 	entry := &Node{key: keyName, value: value}
 	elem := cache.doublyLinkedList.PushFront(entry)
 	cache.items[keyName] = elem
 	return true
+}
+
+func (cache *Cache) Invalidate() bool {
+	last := cache.doublyLinkedList.Back()
+	if last != nil {
+		return cache.Delete(last.Value.(*Node).key)
+	}
+
+	return false
 }
 
 func (cache *Cache) Delete(keyName string) bool {

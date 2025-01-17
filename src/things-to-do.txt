@@ -1,4 +1,4 @@
-Create an simple in memorty cache 
+Create an simple in memory cache
 
 functionalities are below ::
 
