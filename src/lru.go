@@ -6,7 +6,7 @@ import (
 )
 
 type Cache struct {
-	bucketSize         int
+	bucketSize       int
 	items            map[string]*list.Element // consists of key_name : node [node in d-l-l]
 	doublyLinkedList *list.List
 }
@@ -40,19 +40,9 @@ func (cache *Cache) Put(keyName string, value interface{}) bool {
 		return true
 	}
 
-<<<<<<< HEAD
-	if cache.doublyLinkedList.Len() >= cache.capacity {
-		last := cache.doublyLinkedList.Back()
-		if last != nil {
-			if status := cache.Delete(last.Value.(*Node).key); status {
-				return true
-			}
-			return false
-=======
 	if cache.doublyLinkedList.Len() >= cache.bucketSize {
 		if status := cache.Invalidate(); status {
 			return true
->>>>>>> dev_nikhil_inmemory_cache_base_files
 		}
 		return false
 
