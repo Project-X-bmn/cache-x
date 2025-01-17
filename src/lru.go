@@ -16,9 +16,9 @@ type Node struct {
 	value interface{} // using interface as our value could be anything.
 }
 
-func LRUCache(capacity int) *Cache {
+func LRUCache(bucketSize int) *Cache {
 	return &Cache{
-		bucketSize:       capacity,
+		bucketSize:       bucketSize,
 		items:            make(map[string]*list.Element),
 		doublyLinkedList: list.New(),
 	}
@@ -41,16 +41,16 @@ func (cache *Cache) Put(keyName string, value interface{}) bool {
 	}
 
 	if cache.doublyLinkedList.Len() >= cache.bucketSize {
-		if status := cache.Invalidate(); status {
-			return true
+		if status := cache.Invalidate(); !status {
+			fmt.Println("Failed to invalidate ... couldn't put object to cache")
+			return false
 		}
-		return false
-
 	}
 
 	entry := &Node{key: keyName, value: value}
 	elem := cache.doublyLinkedList.PushFront(entry)
 	cache.items[keyName] = elem
+	fmt.Printf("object of key name :: %v , has been added to cache successfully\n", keyName)
 	return true
 }
 
@@ -67,6 +67,7 @@ func (cache *Cache) Delete(keyName string) bool {
 	if node, found := cache.items[keyName]; found {
 		delete(cache.items, keyName)
 		cache.doublyLinkedList.Remove(node)
+		fmt.Printf("object of key name :: %v , has been removed from cache successfully\n", keyName)
 		return true
 	}
 	return false
@@ -91,4 +92,5 @@ func main() {
 
 	cache.Put("e", 5)           // "c" will be evicted
 	fmt.Println(cache.Get("c")) // Output: <nil>, false
+	fmt.Println(cache.Get("e")) // Output: <nil>, false
 }
