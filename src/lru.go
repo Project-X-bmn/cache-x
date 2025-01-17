@@ -44,8 +44,8 @@ func (cache *Cache) Put(keyName string, value interface{}) bool {
 		last := cache.doublyLinkedList.Back()
 		if last != nil {
 			//delete(cache.items, last.Value.(*Node).key)
-			bool1 := cache.Delete(last.Value.(*Node).key)
-			if bool1 != true {
+			isObjRemoved := cache.Delete(last.Value.(*Node).key)
+			if isObjRemoved != true {
 				fmt.Println("Eviction missed ... Error occurs")
 			}
 		}
@@ -85,4 +85,5 @@ func main() {
 
 	cache.Put("e", 5)           // "c" will be evicted
 	fmt.Println(cache.Get("c")) // Output: <nil>, false
+
 }
