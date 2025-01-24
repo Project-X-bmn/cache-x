@@ -1,0 +1,12 @@
+Create an simple in memory cache
+
+functionalities are below ::
+
+1) PUT
+2) GET
+3) DELETE/INVALIDATE
+4) UPDATE [Do we really need this ?? 🤔]
+
+completed those things
+
+Next Learn about Http and Https Http1
